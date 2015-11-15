@@ -43,6 +43,14 @@ def main
   `afplay #{OUTPUT_FILENAME}`
 end
 
+def sine(position_in_period)
+  Math::sin(position_in_period * TWO_PI) * MAX_AMPLITUDE
+end
+
+def triangle(position_in_period)
+  MAX_AMPLITUDE - (((position_in_period * 2.0) - 1.0) * MAX_AMPLITUDE * 2.0).abs
+end
+
 # The dark heart of NanoSynth, the part that actually generates the audio data
 def generate_sample_data(wave_type, num_samples, frequency, mod)
   position_in_period = 0.0
@@ -56,17 +64,7 @@ def generate_sample_data(wave_type, num_samples, frequency, mod)
     # Add next sample to sample list. The sample value is determined by
     # plugging the period offset into the appropriate wave function.
 
-    if wave_type == :sine
-      if i % mod != 0
-        samples[i] = Math::sin(position_in_period * TWO_PI) * MAX_AMPLITUDE
-      else
-        # samples[i] = (position_in_period >= 0.5) ? max_amplitude : -max_amplitude
-        # samples[i] = ((position_in_period * 2.0) - 1.0) * max_amplitude
-        samples[i] = MAX_AMPLITUDE - (((position_in_period * 2.0) - 1.0) * MAX_AMPLITUDE * 2.0).abs
-      # samples[i] = RANDOM_GENERATOR.rand(-max_amplitude..max_amplitude)
-      end
-    end
-
+    samples[i] = i % mod != 0 ? sine(position_in_period) : samples[i] = triangle(position_in_period)
     position_in_period += position_in_period_delta
 
     # Constrain the period between 0.0 and 1.0
@@ -76,10 +74,6 @@ def generate_sample_data(wave_type, num_samples, frequency, mod)
   end
 
   samples
-end
-
-def sine
-
 end
 
 main
