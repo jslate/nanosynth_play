@@ -19,16 +19,20 @@ def play(samples)
   `afplay #{OUTPUT_FILENAME}`
 end
 
+def get_freqencies(arr)
+  [1,8].map do |mod|
+    arr.map do |i|
+      generate_sample_data(:sine, SAMPLE_RATE, get_frequency(i), mod)
+    end
+  end
+end
+
 def main
   minor = [0, 3, 7, 8, 12, 15, 19, 20, 24]
   minor3 = minor.map{|i|i+3}
-  samples = []
-
-  32.times do |j|
-    ([0] + (j.odd? ? minor : minor3).shuffle.slice(1,7)).map {|i|get_frequency(i)}.tap do |a|
-      [1,8].each do |mod|
-        samples += a.map{|f|generate_sample_data(:sine, SAMPLE_RATE, f, mod) }
-      end
+  samples = 0.upto(15).map do |j|
+    [minor, minor3].map do |arr|
+      get_freqencies(arr.shuffle.first(8))
     end
   end
   play(samples.flatten)
