@@ -3,7 +3,6 @@ require 'wavefile'
 OUTPUT_FILENAME = "mysound.wav"
 SAMPLE_RATE = 44100
 TWO_PI = 2 * Math::PI
-RANDOM_GENERATOR = Random.new
 NOTES_PER_OCTAVE = 12
 MAX_AMPLITUDE = 0.5
 BASE_FREQUENCY = 440.0
@@ -12,29 +11,27 @@ def get_frequency(note)
   BASE_FREQUENCY * 2**Rational(note,NOTES_PER_OCTAVE)
 end
 
-def main
-
-  minor = [0, 3, 7, 8, 12, 15, 19, 20, 24]
-  minor3 = minor.map{|i|i+3}
-
-  samples = []
-
-  32.times do |j|
-    ([0] + (j.odd? ? minor : minor3).shuffle.slice(1,7)).map {|i|get_frequency(i)}.tap {|a|
-      r = 1
-      samples += a.map{|a|[a,r]}
-      r = 8
-      samples += a.map{|a|[a,r]}}
-  end
-
-  samples = samples.map{|f|generate_sample_data(:sine, SAMPLE_RATE, f[0].to_f, f[1]) }.flatten
-
+def play(samples)
   buffer = WaveFile::Buffer.new(samples, WaveFile::Format.new(:mono, :float, SAMPLE_RATE))
-
   WaveFile::Writer.new(OUTPUT_FILENAME, WaveFile::Format.new(:mono, :pcm_16, SAMPLE_RATE)) do |writer|
     writer.write(buffer)
   end
   `afplay #{OUTPUT_FILENAME}`
+end
+
+def main
+  minor = [0, 3, 7, 8, 12, 15, 19, 20, 24]
+  minor3 = minor.map{|i|i+3}
+  samples = []
+
+  32.times do |j|
+    ([0] + (j.odd? ? minor : minor3).shuffle.slice(1,7)).map {|i|get_frequency(i)}.tap do |a|
+      [1,8].each do |mod|
+        samples += a.map{|f|generate_sample_data(:sine, SAMPLE_RATE, f, mod) }
+      end
+    end
+  end
+  play(samples.flatten)
 end
 
 def sine(position_in_period)
