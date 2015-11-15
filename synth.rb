@@ -6,11 +6,9 @@ class Synth
   MAX_AMPLITUDE = 0.5
   BASE_FREQUENCY = 440.0
 
-  def get_freqencies(arr)
-    [1,8].map do |mod|
-      arr.map do |i|
-        generate_sample_data(:sine, SAMPLE_RATE, get_frequency(i), mod)
-      end
+  def get_freqencies(arr, tone: :sine)
+    arr.map do |i|
+      generate_sample_data(tone, SAMPLE_RATE, get_frequency(i))
     end
   end
 
@@ -26,7 +24,7 @@ class Synth
     MAX_AMPLITUDE - (((position_in_period * 2.0) - 1.0) * MAX_AMPLITUDE * 2.0).abs
   end
 
-  def generate_sample_data(wave_type, num_samples, frequency, mod)
+  def generate_sample_data(tone, num_samples, frequency)
     position_in_period = 0.0
     position_in_period_delta = frequency / SAMPLE_RATE
 
@@ -34,7 +32,7 @@ class Synth
 
     (num_samples/8).times do |i|
 
-      samples[i] = i % mod != 0 ? sine(position_in_period) : samples[i] = triangle(position_in_period)
+      samples[i] = self.send(tone, position_in_period)
       position_in_period += position_in_period_delta
 
       if(position_in_period >= 1.0)
