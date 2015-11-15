@@ -2,7 +2,7 @@ require './synth'
 require './player'
 
 player = Player.new
-synth = Synth.new
+synth = Synth.new(base_frequency: 640.0, note_per_second: 10)
 
 minor = [0, 3, 7, 8, 12, 15, 19, 20, 24]
 minor3 = minor.map{|i|i+3}
