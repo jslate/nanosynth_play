@@ -1,10 +1,10 @@
 # nanosynth_play
 Playing around with sound
 
-# git clone git@github.com:jslate/nanosynth_play.git
-# cd nanosynth_play
-# bundle install
-# bundle exec ruby song_one.rb
+1. git clone git@github.com:jslate/nanosynth_play.git
+1. cd nanosynth_play
+1. bundle install
+1. bundle exec ruby song_one.rb
 
 Play song_two and song_3, make your own. 
 
